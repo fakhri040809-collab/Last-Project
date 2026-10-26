@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduHub Creative & Productivity Suite</title>
+
+    <!-- Tailwind CSS CDN untuk styling modern dan responsif -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- FontAwesome untuk ikon interaktif -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Font Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- CSS Custom untuk animasi dan visual Peta Pikiran (Mind Map) -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Transisi Animasi Tab */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Visual Struktur Pohon untuk Mind Map */
+        .mindmap-node {
+            position: relative;
+            transition: all 0.2s ease;
+        }
+        .mindmap-tree ul {
+            padding-left: 1.5rem;
+            border-left: 2px dashed #cbd5e1;
+        }
+        .mindmap-tree li {
+            position: relative;
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .mindmap-tree li::before {
+            content: "";
+            position: absolute;
+            top: 1rem;
+            left: -1.5rem;
+            width: 1.25rem;
+            height: 2px;
+            background-color: #cbd5e1;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col md:flex-row">
+
+    <!-- ========================================== -->
+    <!-- NAVIGASI SIDEBAR                           -->
+    <!-- ========================================== -->
+    <aside class="w-full md:w-72 bg-gradient-to-b from-purple-700 via-indigo-700 to-cyan-700 text-white p-5 flex flex-col justify-between shadow-xl flex-shrink-0">
+        <div>
+            <!-- Header Logo -->
+            <div class="flex items-center space-x-3 mb-8 border-b border-purple-500/40 pb-4">
+                <div class="bg-cyan-400 text-purple-950 p-3 rounded-2xl shadow-lg transform -rotate-3">
+                    <i class="fa-solid fa-graduation-cap text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-xl tracking-wide leading-tight">EduHub Suite</h1>
+                    <p class="text-xs text-purple-200">Creative & Productivity</p>
+                </div>
+            </div>
+
+            <!-- Menu Navigasi Tab -->
+            <nav class="space-y-2">
+                <button onclick="switchTab('exam')" id="nav-exam" class="tab-btn active w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl transition duration-200 bg-white/20 font-semibold text-left shadow-sm">
+                    <i class="fa-solid fa-clock text-cyan-300 w-6 text-center text-lg"></i>
+                    <span>Jadwal Ujan & Countdown</span>
+                </button>
+                <button onclick="switchTab('mindmap')" id="nav-mindmap" class="tab-btn w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl transition duration-200 hover:bg-white/10 font-medium text-left">
+                    <i class="fa-solid fa-sitemap text-pink-300 w-6 text-center text-lg"></i>
+                    <span>Catatan & Mind Map</span>
+                </button>
+                <button onclick="switchTab('tracker')" id="nav-tracker" class="tab-btn w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl transition duration-200 hover:bg-white/10 font-medium text-left">
+                    <i class="fa-solid fa-heart-pulse text-amber-300 w-6 text-center text-lg"></i>
+                    <span>Habit & Mood Tracker</span>
+                </button>
+                <button onclick="switchTab('calculator')" id="nav-calculator" class="tab-btn w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl transition duration-200 hover:bg-white/10 font-medium text-left">
+                    <i class="fa-solid fa-calculator text-emerald-300 w-6 text-center text-lg"></i>
+                    <span>Target Nilai Akhir</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- Footer Sidebar -->
+        <div class="mt-8 pt-4 border-t border-purple-500/40 text-xs text-purple-200 text-center">
+            <p><i class="fa-solid fa-code text-cyan-300"></i> Dibuat untuk Belajar Pemula</p>
+            <p class="text-[10px] text-purple-300 mt-1">HTML • Tailwind CSS • JS Vanilla</p>
+        </div>
+    </aside>
+
+    <!-- ========================================== -->
+    <!-- AREA KONTEN UTAMA                          -->
+    <!-- ========================================== -->
+    <main class="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
+
+        <!-- -------------------------------------- -->
+        <!-- FITUR 1: JADWAL UJIAN & COUNTDOWN TIMER-->
+        <!-- -------------------------------------- -->
+        <section id="exam" class="tab-content active max-w-4xl mx-auto">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-md border border-slate-200/80 mb-6">
+                <!-- Header -->
+                <div class="mb-6">
+                    <span class="px-3 py-1 bg-cyan-100 text-cyan-800 rounded-full text-xs font-bold uppercase tracking-wider">
+                        <i class="fa-solid fa-hourglass-half mr-1"></i> Hitung Mundur Waktu Ujian
+                    </span>
+                    <h2 class="text-2xl font-bold text-slate-800 mt-2">Jadwal & Countdown Ujian</h2>
+                    <p class="text-xs text-slate-500">Catat jadwal ujianmu dan pantau sisa waktu hitung mundur secara real-time.</p>
+                </div>
+
+                <!-- Form Tambah Ujian -->
+                <form onsubmit="addExam(event)" class="grid grid-cols-1 sm:grid-cols-12 gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-200 mb-6">
+                    <div class="sm:col-span-5">
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Mata Pelajaran / Nama Ujian</label>
+                        <input type="text" id="exam-title" placeholder="Contoh: UTS Fisika Dasar" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-sm font-medium">
+                    </div>
+                    <div class="sm:col-span-5">
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Tanggal & Waktu Ujian</label>
+                        <input type="datetime-local" id="exam-datetime" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-sm font-medium text-slate-700">
+                    </div>
+                    <div class="sm:col-span-2 flex items-end">
+                        <button type="submit" class="w-full bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-2.5 rounded-xl shadow-md transition flex items-center justify-center gap-1.5 text-sm">
+                            <i class="fa-solid fa-plus"></i> Tambah
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Daftar Kartu Countdown Ujian -->
+                <div id="exam-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Kartu-kartu ujian di-render melalui JavaScript -->
+                </div>
+
+                <!-- Empty State -->
+                <div id="exam-empty" class="text-center py-10 text-slate-400 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                    <i class="fa-solid fa-calendar-plus text-4xl mb-2 text-slate-300"></i>
+                    <p class="text-xs">Belum ada jadwal ujian. Tambahkan mata pelajaran ujianmu di atas!</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- -------------------------------------- -->
+        <!-- FITUR 2: CATATAN & PEMBUAT MIND MAP     -->
+        <!-- -------------------------------------- -->
+        <section id="mindmap" class="tab-content max-w-4xl mx-auto">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-md border border-slate-200/80">
+                <!-- Header -->
+                <div class="mb-6">
+                    <span class="px-3 py-1 bg-pink-100 text-pink-800 rounded-full text-xs font-bold uppercase tracking-wider">
+                        <i class="fa-solid fa-diagram-project mr-1"></i> Visualisasi Konsep
+                    </span>
+                    <h2 class="text-2xl font-bold text-slate-800 mt-2">Catatan Ringkas & Mind Map Generator</h2>
+                    <p class="text-xs text-slate-500">Tuliskan ringkasan materi menggunakan format spasi/sub-poin untuk otomatis membuat pohon pikiran visual!</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <!-- Input Catatan Ringkas -->
+                    <div class="lg:col-span-5 space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Mata Pelajaran / Topik</label>
+                            <input type="text" id="note-subject" value="Biologi - Sistem Pencernaan" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-pink-500 text-sm font-semibold">
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="block text-xs font-bold text-slate-500 uppercase">Input Poin-Poin Catatan</label>
+                                <span class="text-[10px] text-pink-600 font-semibold">Gunakan strip (-) atau sub-tab</span>
+                            </div>
+                            <textarea id="note-content" rows="12" oninput="generateMindMap()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-pink-500 text-xs font-mono leading-relaxed" placeholder="Contoh:
+- Organ Pencernaan
+  - Mulut (Enzim Ptialin)
+  - Lambung (Enzim Pepsin, HCL)
+  - Usus Halus
+- Tips Menjaga Kesehatan
+  - Minum air 2 Liter
+  - Makan serat">Organ Pencernaan Utama
+  Mulut
+    Gigi & Lidah
+    Enzim Ptialin
+  Lambung
+    Asam Klorida (HCl)
+    Enzim Pepsin
+  Usus Halus
+    Penyerapan Nutrisi
+Tips Kesehatan
+  Makan Tepat Waktu
+  Konsumsi Serat</textarea>
+                        </div>
+                        <p class="text-[11px] text-slate-400 italic">
+                            <i class="fa-solid fa-lightbulb text-amber-500 mr-1"></i> Tip: Buat sub-kategori dengan menambahkan spasi di depan teks.
+                        </p>
+                    </div>
+
+                    <!-- Display Visual Mind Map -->
+                    <div class="lg:col-span-7 bg-slate-50 p-5 rounded-2xl border border-slate-200 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-4">
+                                <h3 class="text-sm font-bold text-slate-700 flex items-center gap-2">
+                                    <i class="fa-solid fa-tree text-pink-500"></i> Visualisasi Pohon Konsep
+                                </h3>
+                                <span class="text-[10px] bg-pink-100 text-pink-700 font-bold px-2 py-0.5 rounded-md">Live Preview</span>
+                            </div>
+
+                            <!-- Root Mind Map Container -->
+                            <div class="overflow-x-auto pb-4">
+                                <div id="mindmap-title-display" class="font-extrabold text-indigo-900 bg-indigo-100 border border-indigo-200 px-4 py-2 rounded-xl inline-block mb-3 shadow-sm text-sm">
+                                    <!-- Judul di-render via JS -->
+                                </div>
+                                <div id="mindmap-tree-display" class="mindmap-tree pl-2">
+                                    <!-- Struktur Pohon di-render via JS -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-right text-[10px] text-slate-400 pt-2 border-t border-slate-200">
+                            Diupdate secara otomatis sesuai catatan di sebelah kiri
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- -------------------------------------- -->
+        <!-- FITUR 3: PELACAK KEBIASAAN & MOOD      -->
+        <!-- -------------------------------------- -->
+        <section id="tracker" class="tab-content max-w-4xl mx-auto">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-md border border-slate-200/80">
+                <!-- Header -->
+                <div class="mb-6">
+                    <span class="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-xs font-bold uppercase tracking-wider">
+                        <i class="fa-solid fa-face-smile mr-1"></i> Jurnal Harian
+                    </span>
+                    <h2 class="text-2xl font-bold text-slate-800 mt-2">Study Habit & Mood Tracker</h2>
+                    <p class="text-xs text-slate-500">Pantau berapa jam kamu belajar setiap hari dan catat perasaanmu!</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <!-- Form Input Log Belajar -->
+                    <div class="lg:col-span-5 bg-slate-50 p-5 rounded-2xl border border-slate-200">
+                        <h3 class="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-pen-to-square text-amber-500"></i> Catat Log Hari Ini
+                        </h3>
+                        
+                        <form onsubmit="addStudyLog(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Durasi Belajar (Jam)</label>
+                                <input type="number" id="log-hours" min="0.5" max="15" step="0.5" value="2" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm font-bold text-slate-700">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Pilih Mood Hari Ini</label>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="mood-option" value="🤩 Sangat Semangat" checked class="peer hidden">
+                                        <div class="p-2.5 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-center peer-checked:border-amber-500 peer-checked:bg-amber-50 peer-checked:text-amber-800 transition">
+                                            🤩 Semangat
+                                        </div>
+                                    </label>
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="mood-option" value="😊 Fokus" class="peer hidden">
+                                        <div class="p-2.5 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-center peer-checked:border-amber-500 peer-checked:bg-amber-50 peer-checked:text-amber-800 transition">
+                                            😊 Fokus
+                                        </div>
+                                    </label>
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="mood-option" value="😴 Mengantuk" class="peer hidden">
+                                        <div class="p-2.5 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-center peer-checked:border-amber-500 peer-checked:bg-amber-50 peer-checked:text-amber-800 transition">
+                                            😴 Mengantuk
+                                        </div>
+                                    </label>
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="mood-option" value="🤯 Pusing/Stres" class="peer hidden">
+                                        <div class="p-2.5 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-center peer-checked:border-amber-500 peer-checked:bg-amber-50 peer-checked:text-amber-800 transition">
+                                            🤯 Pusing
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-xl shadow-md transition text-xs">
+                                <i class="fa-solid fa-floppy-disk mr-1"></i> Simpan Log Belajar
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Statistik & Riwayat Mood -->
+                    <div class="lg:col-span-7 space-y-4">
+                        <!-- Card Statistik Ringkas -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-gradient-to-br from-indigo-500 to-purple-600 text-white p-4 rounded-2xl shadow-sm">
+                                <span class="text-[10px] font-bold text-indigo-200 uppercase tracking-wider block">Total Jam Belajar</span>
+                                <span id="stat-total-hours" class="text-2xl font-black">0 Jam</span>
+                            </div>
+                            <div class="bg-gradient-to-br from-amber-400 to-orange-500 text-white p-4 rounded-2xl shadow-sm">
+                                <span class="text-[10px] font-bold text-amber-100 uppercase tracking-wider block">Mood Dominan</span>
+                                <span id="stat-dominant-mood" class="text-lg font-bold truncate block">-</span>
+                            </div>
+                        </div>
+
+                        <!-- Banner Motivasi Berdasarkan Mood -->
+                        <div id="motivation-box" class="p-4 rounded-2xl bg-amber-50 border border-amber-200 flex items-start space-x-3">
+                            <i class="fa-solid fa-quote-left text-amber-500 text-xl mt-0.5"></i>
+                            <div>
+                                <h4 class="text-xs font-bold text-amber-900 uppercase">Kata Motivasi Hari Ini:</h4>
+                                <p id="motivation-text" class="text-xs font-medium text-amber-800 mt-1 italic">
+                                    "Semangat terus! Konsistensi kecil setiap hari akan membawa hasil yang luar biasa."
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Riwayat Log List -->
+                        <div>
+                            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Riwayat Log Minggu Ini:</h4>
+                            <ul id="tracker-history-list" class="space-y-2 max-h-48 overflow-y-auto pr-1">
+                                <!-- Log items di-render melalui JavaScript -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- -------------------------------------- -->
+        <!-- FITUR 4: KALKULATOR TARGET NILAI AKHIR -->
+        <!-- -------------------------------------- -->
+        <section id="calculator" class="tab-content max-w-3xl mx-auto">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-md border border-slate-200/80">
+                <!-- Header -->
+                <div class="mb-6">
+                    <span class="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-bold uppercase tracking-wider">
+                        <i class="fa-solid fa-bullseye mr-1"></i> Perencanaan Akademik
+                    </span>
+                    <h2 class="text-2xl font-bold text-slate-800 mt-2">Kalkulator Target Nilai UAS</h2>
+                    <p class="text-xs text-slate-500">Hitung berapa nilai minimal yang harus kamu raih di UAS agar mencapai Target Nilai Akhir impianmu!</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                    <!-- Form Input Nilai & Bobot -->
+                    <div class="md:col-span-7 space-y-4">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Rata-rata Tugas</label>
+                                <input type="number" id="score-tugas" min="0" max="100" value="85" oninput="calculateRequiredUAS()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm font-semibold">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Bobot Tugas (%)</label>
+                                <input type="number" id="weight-tugas" min="0" max="100" value="30" oninput="calculateRequiredUAS()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm font-semibold">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Nilai UTS</label>
+                                <input type="number" id="score-uts" min="0" max="100" value="75" oninput="calculateRequiredUAS()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm font-semibold">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Bobot UTS (%)</label>
+                                <input type="number" id="weight-uts" min="0" max="100" value="30" oninput="calculateRequiredUAS()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm font-semibold">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1 text-emerald-700">Target Nilai Akhir</label>
+                                <input type="number" id="score-target" min="0" max="100" value="85" oninput="calculateRequiredUAS()" class="w-full px-3.5 py-2.5 rounded-xl border-2 border-emerald-400 bg-emerald-50/30 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm font-extrabold text-emerald-900">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Bobot UAS (%)</label>
+                                <input type="number" id="weight-uas" min="0" max="100" value="40" readonly class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-100 text-sm font-semibold text-slate-500">
+                            </div>
+                        </div>
+
+                        <p id="weight-warning" class="text-[11px] text-rose-500 hidden font-semibold">
+                            <i class="fa-solid fa-circle-exclamation mr-1"></i> Total bobot persentase harus sama dengan 100%!
+                        </p>
+                    </div>
+
+                    <!-- Display Hasil Rekomendasi UAS -->
+                    <div class="md:col-span-5 bg-gradient-to-br from-slate-900 to-indigo-950 text-white p-6 rounded-3xl flex flex-col justify-between text-center relative overflow-hidden shadow-xl">
+                        <div class="relative z-10">
+                            <span class="text-[10px] font-bold text-indigo-300 uppercase tracking-widest block mb-2">Nilai UAS Yang Dibutuhkan</span>
+                            <div id="result-uas-score" class="text-5xl font-black text-emerald-400 tracking-tight my-4">
+                                92.5
+                            </div>
+                            <p id="result-uas-status" class="text-xs font-semibold px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 inline-block border border-emerald-500/30">
+                                Sangat Mungkin Dicapai 💪
+                            </p>
+                        </div>
+
+                        <div class="relative z-10 pt-4 border-t border-indigo-800/60 mt-4">
+                            <p id="result-uas-desc" class="text-xs text-indigo-200 leading-relaxed">
+                                Kamu perlu mendapatkan nilai minimal <strong>92.5</strong> pada UAS mendatang untuk mengamankan Nilai Akhir <strong>85</strong>.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+
+    <!-- ========================================== -->
+    <!-- LOGIKA JAVASCRIPT (VANILLA JS)             -->
+    <!-- ========================================== -->
+    <script>
+        /* ----------------------------------------------------
+           1. LOGIKA NAVIGASI TAB UTAMA
+        ---------------------------------------------------- */
+        function switchTab(tabId) {
+            // Sembunyikan semua konten tab
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // Tampilkan tab yang dipilih
+            document.getElementById(tabId).classList.add('active');
+
+            // Reset style tombol navigasi
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('bg-white/20', 'font-semibold', 'shadow-sm');
+                btn.classList.add('hover:bg-white/10', 'font-medium');
+            });
+
+            // Aktifkan tombol yang diklik
+            const activeBtn = document.getElementById('nav-' + tabId);
+            activeBtn.classList.add('bg-white/20', 'font-semibold', 'shadow-sm');
+            activeBtn.classList.remove('hover:bg-white/10');
+        }
+
+        /* ----------------------------------------------------
+           2. FITUR 1: JADWAL UJIAN & COUNTDOWN TIMER
+        ---------------------------------------------------- */
+        let exams = [
+            { id: 1, title: "Ujian Akhir Biologi", datetime: new Date(Date.now() + 86400000 * 3).toISOString().slice(0, 16) },
+            { id: 2, title: "Kuis Matematika Peminatan", datetime: new Date(Date.now() + 3600000 * 5).toISOString().slice(0, 16) }
+        ];
+
+        function addExam(event) {
+            event.preventDefault();
+            const titleInput = document.getElementById('exam-title');
+            const datetimeInput = document.getElementById('exam-datetime');
+
+            const newExam = {
+                id: Date.now(),
+                title: titleInput.value.trim(),
+                datetime: datetimeInput.value
+            };
+
+            exams.push(newExam);
+            // Urutkan jadwal berdasarkan tanggal terdekat
+            exams.sort((a, b) => new Date(a.datetime) - new Date(b.datetime));
+
+            titleInput.value = "";
+            datetimeInput.value = "";
+            renderExams();
+        }
+
+        function deleteExam(id) {
+            exams = exams.filter(e => e.id !== id);
+            renderExams();
+        }
+
+        function renderExams() {
+            const listContainer = document.getElementById('exam-list');
+            const emptyContainer = document.getElementById('exam-empty');
+
+            if (exams.length === 0) {
+                listContainer.innerHTML = "";
+                emptyContainer.classList.remove('hidden');
+                return;
+            }
+
+            emptyContainer.classList.add('hidden');
+            listContainer.innerHTML = "";
+
+            const now = new Date();
+
+            exams.forEach(exam => {
+                const targetDate = new Date(exam.datetime);
+                const diffTime = targetDate - now;
+
+                let statusBadge = "";
+                let timeText = "";
+                let isFinished = false;
+
+                if (diffTime <= 0) {
+                    isFinished = true;
+                    statusBadge = `<span class="px-2.5 py-1 bg-slate-200 text-slate-700 text-[10px] font-bold rounded-full">Selesai</span>`;
+                    timeText = "Ujian Telah Berlangsung";
+                } else {
+                    const days = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((diffTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((diffTime % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((diffTime % (1000 * 60)) / 1000);
+
+                    if (days === 0 && hours < 24) {
+                        statusBadge = `<span class="px-2.5 py-1 bg-amber-100 text-amber-800 text-[10px] font-bold rounded-full animate-pulse">Hari Ini / Segera</span>`;
+                    } else {
+                        statusBadge = `<span class="px-2.5 py-1 bg-cyan-100 text-cyan-800 text-[10px] font-bold rounded-full">Mendatang</span>`;
+                    }
+
+                    timeText = `
+                        <div class="grid grid-cols-4 gap-1 text-center mt-3 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                            <div><span class="font-extrabold text-slate-800 text-base">${days}</span><span class="block text-[9px] text-slate-400 uppercase font-bold">Hari</span></div>
+                            <div><span class="font-extrabold text-slate-800 text-base">${String(hours).padStart(2, '0')}</span><span class="block text-[9px] text-slate-400 uppercase font-bold">Jam</span></div>
+                            <div><span class="font-extrabold text-slate-800 text-base">${String(minutes).padStart(2, '0')}</span><span class="block text-[9px] text-slate-400 uppercase font-bold">Mnt</span></div>
+                            <div><span class="font-extrabold text-cyan-600 text-base">${String(seconds).padStart(2, '0')}</span><span class="block text-[9px] text-slate-400 uppercase font-bold">Det</span></div>
+                        </div>
+                    `;
+                }
+
+                // Format Tanggal Rapi
+                const options = { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+                const dateFormatted = targetDate.toLocaleDateString('id-ID', options);
+
+                const card = document.createElement('div');
+                card.className = "bg-white p-5 rounded-2xl border border-slate-200 shadow-sm relative flex flex-col justify-between";
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start gap-2 mb-2">
+                            <h3 class="font-bold text-slate-800 text-base">${exam.title}</h3>
+                            ${statusBadge}
+                        </div>
+                        <p class="text-xs text-slate-400 mb-1">
+                            <i class="fa-regular fa-clock mr-1"></i> ${dateFormatted}
+                        </p>
+                        ${timeText}
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-100 flex justify-end">
+                        <button onclick="deleteExam(${exam.id})" class="text-xs text-slate-400 hover:text-rose-500 font-semibold transition flex items-center gap-1">
+                            <i class="fa-solid fa-trash-can"></i> Hapus
+                        </button>
+                    </div>
+                `;
+                listContainer.appendChild(card);
+            });
+        }
+
+        // Update countdown setiap detik secara real-time
+        setInterval(() => {
+            const activeTab = document.getElementById('exam');
+            if (activeTab.classList.contains('active')) {
+                renderExams();
+            }
+        }, 1000);
+
+
+        /* ----------------------------------------------------
+           3. FITUR 2: CATATAN & MIND MAP GENERATOR
+        ---------------------------------------------------- */
+        function generateMindMap() {
+            const subject = document.getElementById('note-subject').value || "Topik Pelajaran";
+            const textContent = document.getElementById('note-content').value;
+
+            document.getElementById('mindmap-title-display').innerHTML = `<i class="fa-solid fa-book-bookmark mr-2"></i> ${subject}`;
+
+            const treeContainer = document.getElementById('mindmap-tree-display');
+            treeContainer.innerHTML = "";
+
+            if (!textContent.trim()) {
+                treeContainer.innerHTML = `<p class="text-xs text-slate-400 italic">Ketik catatan di sebelah kiri untuk melihat peta pikiran...</p>`;
+                return;
+            }
+
+            const lines = textContent.split('\n').filter(line => line.trim() !== "");
+            
+            // Konversi teks terindentasi menjadi HTML list bertingkat
+            let htmlTree = "<ul>";
+            let currentLevel = 0;
+
+            lines.forEach(line => {
+                // Hitung spasi di awal kalimat
+                const indentSpaces = line.search(/\S|$/);
+                const cleanText = line.trim().replace(/^[-*•]\s*/, '');
+                
+                // Estimasi level indentasi (setiap 2 spasi = 1 sub level)
+                const level = Math.floor(indentSpaces / 2);
+
+                if (level > currentLevel) {
+                    htmlTree += "<ul>".repeat(level - currentLevel);
+                } else if (level < currentLevel) {
+                    htmlTree += "</ul>".repeat(currentLevel - level);
+                }
+
+                htmlTree += `
+                    <li>
+                        <span class="mindmap-node inline-block bg-white text-slate-700 border border-slate-200 shadow-sm px-3 py-1.5 rounded-xl text-xs font-medium hover:border-pink-400">
+                            ${cleanText}
+                        </span>
+                    </li>
+                `;
+
+                currentLevel = level;
+            });
+
+            htmlTree += "</ul>".repeat(currentLevel + 1);
+            treeContainer.innerHTML = htmlTree;
+        }
+
+        /* ----------------------------------------------------
+           4. FITUR 3: STUDY HABIT & MOOD TRACKER
+        ---------------------------------------------------- */
+        let studyLogs = [
+            { id: 1, hours: 2.5, mood: "🤩 Sangat Semangat", date: "Kemarin" },
+            { id: 2, hours: 1.5, mood: "😊 Fokus", date: "Hari ini" }
+        ];
+
+        function addStudyLog(event) {
+            event.preventDefault();
+            const hoursInput = parseFloat(document.getElementById('log-hours').value);
+            const moodSelected = document.querySelector('input[name="mood-option"]:checked').value;
+
+            const newLog = {
+                id: Date.now(),
+                hours: hoursInput,
+                mood: moodSelected,
+                date: new Date().toLocaleDateString('id-ID', { weekday: 'short', hour: '2-digit', minute: '2-digit' })
+            };
+
+            studyLogs.unshift(newLog);
+            renderStudyLogs();
+        }
+
+        function renderStudyLogs() {
+            const historyList = document.getElementById('tracker-history-list');
+            historyList.innerHTML = "";
+
+            let totalHours = 0;
+            const moodCounts = {};
+
+            studyLogs.forEach(log => {
+                totalHours += log.hours;
+                moodCounts[log.mood] = (moodCounts[log.mood] || 0) + 1;
+
+                const li = document.createElement('li');
+                li.className = "bg-white p-3 rounded-xl border border-slate-200 flex justify-between items-center text-xs";
+                li.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <span class="font-bold text-slate-800">${log.mood}</span>
+                        <span class="text-slate-400">•</span>
+                        <span class="text-slate-500 font-semibold">${log.hours} Jam</span>
+                    </div>
+                    <span class="text-[10px] text-slate-400">${log.date}</span>
+                `;
+                historyList.appendChild(li);
+            });
+
+            // Hitung statistik
+            document.getElementById('stat-total-hours').textContent = `${totalHours} Jam`;
+
+            // Cari mood terbanyak
+            let maxCount = 0;
+            let dominantMood = "-";
+            for (const mood in moodCounts) {
+                if (moodCounts[mood] > maxCount) {
+                    maxCount = moodCounts[mood];
+                    dominantMood = mood;
+                }
+            }
+            document.getElementById('stat-dominant-mood').textContent = dominantMood;
+
+            // Update Kata Motivasi Sesuai Mood Terakhir
+            const latestMood = studyLogs.length > 0 ? studyLogs[0].mood : "";
+            const motivationText = document.getElementById('motivation-text');
+
+            if (latestMood.includes("Semangat")) {
+                motivationText.textContent = '"Luar biasa! Pertahankan energi positif ini untuk menaklukkan target-target besarmu!"';
+            } else if (latestMood.includes("Fokus")) {
+                motivationText.textContent = '"Fokus adalah kunci utama keberhasilan. Kamu sedang berada di jalur yang sangat tepat!"';
+            } else if (latestMood.includes("Mengantuk")) {
+                motivationText.textContent = '"Jangan dipaksakan jika lelah. Istirahat sejenak 15 menit atau cuci muka agar segar kembali."';
+            } else if (latestMood.includes("Pusing")) {
+                motivationText.textContent = '"Ambil napas dalam-dalam. Istirahat dulu, minum air putih, dan bagi tugas besar jadi bagian-bagian kecil."';
+            }
+        }
+
+        /* ----------------------------------------------------
+           5. FITUR 4: KALKULATOR TARGET NILAI AKHIR
+        ---------------------------------------------------- */
+        function calculateRequiredUAS() {
+            const scoreTugas = parseFloat(document.getElementById('score-tugas').value) || 0;
+            const weightTugas = parseFloat(document.getElementById('weight-tugas').value) || 0;
+            
+            const scoreUTS = parseFloat(document.getElementById('score-uts').value) || 0;
+            const weightUTS = parseFloat(document.getElementById('weight-uts').value) || 0;
+
+            const targetFinal = parseFloat(document.getElementById('score-target').value) || 0;
+
+            // Hitung Bobot UAS secara otomatis agar total persentase = 100%
+            const weightUAS = 100 - (weightTugas + weightUTS);
+            document.getElementById('weight-uas').value = weightUAS;
+
+            const warningEl = document.getElementById('weight-warning');
+            if (weightUAS <= 0) {
+                warningEl.classList.remove('hidden');
+                return;
+            } else {
+                warningEl.classList.add('hidden');
+            }
+
+            // Rumus: Target = (Tugas*wTugas) + (UTS*wUTS) + (UAS*wUAS)
+            // Maka: UAS = [Target - (Tugas*wTugas + UTS*wUTS)] / wUAS
+            const currentContribution = (scoreTugas * (weightTugas / 100)) + (scoreUTS * (weightUTS / 100));
+            const neededFromUAS = targetFinal - currentContribution;
+            const requiredUAS = (neededFromUAS / (weightUAS / 100));
+
+            const displayScore = document.getElementById('result-uas-score');
+            const displayStatus = document.getElementById('result-uas-status');
+            const displayDesc = document.getElementById('result-uas-desc');
+
+            const roundedUAS = Math.max(0, requiredUAS).toFixed(1);
+            displayScore.textContent = roundedUAS;
+
+            if (requiredUAS <= 0) {
+                displayStatus.className = "text-xs font-semibold px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 inline-block border border-emerald-500/30";
+                displayStatus.textContent = "Aman! Sudah Mencapai Target 🎉";
+                displayDesc.innerHTML = `Tanpa nilai UAS pun, akumulasi nilaimu sudah memenuhi target nilai <strong>${targetFinal}</strong>.`;
+            } else if (requiredUAS <= 75) {
+                displayStatus.className = "text-xs font-semibold px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 inline-block border border-emerald-500/30";
+                displayStatus.textContent = "Sangat Mungkin Dicapai 💪";
+                displayDesc.innerHTML = `Kamu hanya butuh nilai minimal <strong>${roundedUAS}</strong> di UAS untuk mengamankan nilai akhir <strong>${targetFinal}</strong>.`;
+            } else if (requiredUAS <= 100) {
+                displayStatus.className = "text-xs font-semibold px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 inline-block border border-amber-500/30";
+                displayStatus.textContent = "Butuh Usaha Ekstra ⚡";
+                displayDesc.innerHTML = `Kamu harus berjuang meraih nilai <strong>${roundedUAS}</strong> di UAS. Ayo tingkatkan waktu belajarmu!`;
+            } else {
+                displayStatus.className = "text-xs font-semibold px-3 py-1 rounded-full bg-rose-500/20 text-rose-300 inline-block border border-rose-500/30";
+                displayStatus.textContent = "Target Terlalu Tinggi ⚠️";
+                displayDesc.innerHTML = `Dibutuhkan nilai UAS <strong>${roundedUAS}</strong> (di atas 100) untuk mencapai target <strong>${targetFinal}</strong>. Pertimbangkan menyesuaikan target.`;
+            }
+        }
+
+        /* ----------------------------------------------------
+           INISIALISASI SAAT HALAMAN DIMUAT
+        ---------------------------------------------------- */
+        window.onload = function() {
+            renderExams();
+            generateMindMap();
+            renderStudyLogs();
+            calculateRequiredUAS();
+        };
+    </script>
+</body>
+</html>

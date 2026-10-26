@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduLab Interactive Simulation Suite</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        /* Transisi Smooth untuk Tab */
+        .tab-content {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .tab-content.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* CSS 3D Flip Card untuk Game Memory */
+        .memory-card {
+            perspective: 1000px;
+        }
+        .memory-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.5s;
+            transform-style: preserve-3d;
+        }
+        .memory-card.flipped .memory-card-inner {
+            transform: rotateY(180deg);
+        }
+        .memory-card-front, .memory-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 1rem;
+        }
+        .memory-card-back {
+            transform: rotateY(180deg);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- ========================================== -->
+    <!-- HEADER & NAVIGASI TAB                      -->
+    <!-- ========================================== -->
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200/80 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col sm:flex-row items-center justify-between gap-4">
+            
+            <!-- Logo App -->
+            <div class="flex items-center space-x-3">
+                <div class="bg-gradient-to-tr from-indigo-500 to-cyan-400 text-white p-2.5 rounded-2xl shadow-md shadow-indigo-200">
+                    <i class="fa-solid fa-flask text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-lg text-slate-800 tracking-tight leading-tight">EduLab Suite</h1>
+                    <p class="text-[11px] font-semibold text-indigo-600 uppercase tracking-wider">Interactive Science & Learning</p>
+                </div>
+            </div>
+
+            <!-- Menu Tab Navigasi -->
+            <nav class="flex items-center bg-slate-100 p-1.5 rounded-2xl border border-slate-200/60 overflow-x-auto max-w-full">
+                <button onclick="switchTab('pendulum')" id="nav-pendulum" class="tab-btn active px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 bg-white text-indigo-600 shadow-sm whitespace-nowrap flex items-center gap-2">
+                    <i class="fa-solid fa-atom text-indigo-500"></i> Simulator Bandul
+                </button>
+                <button onclick="switchTab('memory')" id="nav-memory" class="tab-btn px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 text-slate-600 hover:text-indigo-600 whitespace-nowrap flex items-center gap-2">
+                    <i class="fa-solid fa-brain text-purple-500"></i> Memory Match
+                </button>
+                <button onclick="switchTab('converter')" id="nav-converter" class="tab-btn px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 text-slate-600 hover:text-indigo-600 whitespace-nowrap flex items-center gap-2">
+                    <i class="fa-solid fa-calculator text-emerald-500"></i> Konverter Satuan
+                </button>
+                <button onclick="switchTab('quotes')" id="nav-quotes" class="tab-btn px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 text-slate-600 hover:text-indigo-600 whitespace-nowrap flex items-center gap-2">
+                    <i class="fa-solid fa-lightbulb text-amber-500"></i> Motivasi & Brain Teaser
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ========================================== -->
+    <!-- KONTEN UTAMA                               -->
+    <!-- ========================================== -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- -------------------------------------- -->
+        <!-- FITUR 1: SIMULATOR AYUNAN BANDUL       -->
+        <!-- -------------------------------------- -->
+        <section id="pendulum" class="tab-content active">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                
+                <!-- Canvas Simulation Display -->
+                <div class="lg:col-span-7 bg-white p-5 rounded-3xl border border-slate-200/80 shadow-sm flex flex-col items-center">
+                    <div class="w-full flex justify-between items-center mb-4">
+                        <span class="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-xs font-bold uppercase tracking-wider">
+                            <i class="fa-solid fa-play text-[10px] mr-1"></i> Visualisasi Real-Time
+                        </span>
+                        <div class="flex items-center gap-2">
+                            <button id="btn-pause-pendulum" onclick="togglePendulumPause()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition flex items-center gap-1">
+                                <i class="fa-solid fa-pause"></i> Pause
+                            </button>
+                            <button onclick="resetPendulum()" class="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-xs font-bold rounded-xl transition flex items-center gap-1">
+                                <i class="fa-solid fa-rotate-left"></i> Reset
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Canvas Element -->
+                    <div class="w-full bg-slate-900 rounded-2xl overflow-hidden shadow-inner flex items-center justify-center p-2 relative">
+                        <canvas id="pendulumCanvas" class="w-full max-w-md h-72 sm:h-80 block"></canvas>
+                        <div class="absolute top-3 left-3 bg-slate-800/80 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-700 text-white text-[11px] font-mono">
+                            Sudut (&theta;): <span id="val-angle-display" class="text-cyan-400 font-bold">0.0°</span>
+                        </div>
+                    </div>
+
+                    <!-- Indikator Rumus Fisika -->
+                    <div class="w-full mt-4 p-4 bg-slate-50 rounded-2xl border border-slate-200/80 grid grid-cols-2 gap-4 text-center">
+                        <div class="bg-white p-3 rounded-xl border border-slate-100 shadow-xs">
+                            <span class="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider block">Periode Ayunan (T)</span>
+                            <span id="res-period" class="text-xl font-extrabold text-indigo-600">0.00 s</span>
+                            <span class="text-[10px] text-slate-400 block mt-0.5">Rumus: T = 2&pi; &radic;(L / g)</span>
+                        </div>
+                        <div class="bg-white p-3 rounded-xl border border-slate-100 shadow-xs">
+                            <span class="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider block">Frekuensi (f)</span>
+                            <span id="res-frequency" class="text-xl font-extrabold text-cyan-600">0.00 Hz</span>
+                            <span class="text-[10px] text-slate-400 block mt-0.5">Rumus: f = 1 / T</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Control Panel Slider -->
+                <div class="lg:col-span-5 bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm space-y-5">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800">Kontrol Parameter Fisika</h2>
+                        <p class="text-xs text-slate-500">Geser nilai di bawah untuk melihat efek langsung pada kecepatan dan periode bandul.</p>
+                    </div>
+
+                    <!-- Slider Panjang Tali (L) -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center text-xs font-bold">
+                            <label for="slider-length" class="text-slate-700">Panjang Tali (L)</label>
+                            <span id="val-length" class="text-indigo-600 font-mono bg-indigo-50 px-2 py-0.5 rounded-lg">1.5 m</span>
+                        </div>
+                        <input type="range" id="slider-length" min="0.5" max="3.0" step="0.1" value="1.5" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+                    </div>
+
+                    <!-- Slider Massa Beban (m) -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center text-xs font-bold">
+                            <label for="slider-mass" class="text-slate-700">Massa Beban (m)</label>
+                            <span id="val-mass" class="text-indigo-600 font-mono bg-indigo-50 px-2 py-0.5 rounded-lg">10 kg</span>
+                        </div>
+                        <input type="range" id="slider-mass" min="1" max="50" step="1" value="10" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+                    </div>
+
+                    <!-- Selection Gravitasi Preset (g) -->
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold text-slate-700">Lingkungan Gravitasi (g)</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button onclick="setGravity(9.8, 'Bumi', this)" class="btn-gravity active p-2.5 rounded-xl border border-indigo-200 bg-indigo-50 text-indigo-700 text-xs font-bold text-center transition">
+                                🌍 Bumi <br><span class="text-[10px] font-normal opacity-80">9.8 m/s²</span>
+                            </button>
+                            <button onclick="setGravity(1.62, 'Bulan', this)" class="btn-gravity p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold text-center transition">
+                                🌙 Bulan <br><span class="text-[10px] font-normal opacity-80">1.62 m/s²</span>
+                            </button>
+                            <button onclick="setGravity(24.79, 'Jupiter', this)" class="btn-gravity p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold text-center transition">
+                                🪐 Jupiter <br><span class="text-[10px] font-normal opacity-80">24.79 m/s²</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Penjelasan Edukasi -->
+                    <div class="p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100 text-xs text-slate-600 space-y-1">
+                        <p class="font-bold text-indigo-900"><i class="fa-solid fa-circle-info text-indigo-500 mr-1"></i> Fakta Fisika:</p>
+                        <p>Massa beban <strong>tidak mempengaruhi</strong> periode ayunan bandul! Hanya panjang tali dan gravitasi yang mempengaruhi kecepatannya.</p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- -------------------------------------- -->
+        <!-- FITUR 2: GAME MEMORY MATCH CARD        -->
+        <!-- -------------------------------------- -->
+        <section id="memory" class="tab-content">
+            <div class="max-w-4xl mx-auto space-y-6">
+                
+                <!-- Game Header Info Bar -->
+                <div class="bg-white p-4 sm:p-5 rounded-3xl border border-slate-200/80 shadow-sm flex flex-wrap items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800">Memory Match Science</h2>
+                        <p class="text-xs text-slate-500">Cocokkan pasangan ikon sains secepat mungkin!</p>
+                    </div>
+
+                    <!-- Stats Bar -->
+                    <div class="flex items-center gap-4">
+                        <div class="bg-slate-100 px-3.5 py-1.5 rounded-xl text-center">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Langkah</span>
+                            <span id="memory-moves" class="text-lg font-black text-slate-800">0</span>
+                        </div>
+                        <div class="bg-slate-100 px-3.5 py-1.5 rounded-xl text-center">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Waktu</span>
+                            <span id="memory-timer" class="text-lg font-black text-purple-600 font-mono">00:00</span>
+                        </div>
+                        <button onclick="initMemoryGame()" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-rotate-right"></i> Game Baru
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Grid Kartu Memory -->
+                <div id="memory-grid" class="grid grid-cols-4 gap-3 sm:gap-4 max-w-2xl mx-auto">
+                    <!-- Cards di-render secara dinamis via JS -->
+                </div>
+
+            </div>
+        </section>
+
+        <!-- -------------------------------------- -->
+        <!-- FITUR 3: KONVERTER SATUAN SAINS        -->
+        <!-- -------------------------------------- -->
+        <section id="converter" class="tab-content">
+            <div class="max-w-4xl mx-auto bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm space-y-6">
+                <div>
+                    <span class="px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-xs font-bold uppercase tracking-wider">
+                        <i class="fa-solid fa-calculator mr-1"></i> Multi Converter
+                    </span>
+                    <h2 class="text-2xl font-bold text-slate-800 mt-2">Konverter Satuan & Sains</h2>
+                    <p class="text-xs text-slate-500">Hitung nilai konversi secara akurat lengkap dengan penjelasan formula matematisnya.</p>
+                </div>
+
+                <!-- Mode Selection Tab -->
+                <div class="flex gap-2 border-b border-slate-200 pb-3 overflow-x-auto">
+                    <button onclick="setConverterMode('temp')" id="btn-conv-temp" class="conv-tab-btn px-4 py-2 rounded-xl text-xs font-bold bg-emerald-500 text-white shadow-sm">
+                        🌡️ Suhu
+                    </button>
+                    <button onclick="setConverterMode('data')" id="btn-conv-data" class="conv-tab-btn px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100">
+                        💾 Data Digital
+                    </button>
+                    <button onclick="setConverterMode('speed')" id="btn-conv-speed" class="conv-tab-btn px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100">
+                        🚀 Kecepatan
+                    </button>
+                    <button onclick="setConverterMode('length')" id="btn-conv-length" class="conv-tab-btn px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100">
+                        📏 Panjang
+                    </button>
+                </div>
+
+                <!-- Input Form Konversi -->
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center bg-slate-50 p-6 rounded-2xl border border-slate-200/80">
+                    <!-- Dari (From) -->
+                    <div class="md:col-span-5 space-y-2">
+                        <label class="block text-xs font-bold text-slate-500 uppercase">Input Nilai & Satuan</label>
+                        <input type="number" id="conv-input" value="100" oninput="runConversion()" class="w-full px-4 py-3 rounded-xl border border-slate-300 font-extrabold text-slate-800 text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                        <select id="conv-unit-from" onchange="runConversion()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-semibold text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
+                            <!-- Option di-populate via JS -->
+                        </select>
+                    </div>
+
+                    <!-- Icon Arrow Separator -->
+                    <div class="md:col-span-2 flex justify-center py-2">
+                        <div class="bg-white p-3 rounded-full border border-slate-200 shadow-sm text-emerald-600">
+                            <i class="fa-solid fa-arrow-right-long text-lg hidden md:block"></i>
+                            <i class="fa-solid fa-arrow-down-long text-lg md:hidden"></i>
+                        </div>
+                    </div>
+
+                    <!-- Ke (To) -->
+                    <div class="md:col-span-5 space-y-2">
+                        <label class="block text-xs font-bold text-slate-500 uppercase">Hasil Konversi</label>
+                        <div id="conv-output" class="w-full px-4 py-3 bg-white rounded-xl border border-emerald-300 font-black text-emerald-600 text-lg shadow-inner flex items-center">
+                            212
+                        </div>
+                        <select id="conv-unit-to" onchange="runConversion()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-semibold text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
+                            <!-- Option di-populate via JS -->
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Rumus Formula Penjelasan -->
+                <div class="p-4 bg-emerald-50/60 rounded-2xl border border-emerald-100 flex items-start gap-3">
+                    <i class="fa-solid fa-square-root-variable text-emerald-600 text-xl mt-0.5"></i>
+                    <div>
+                        <h4 class="text-xs font-bold text-emerald-900 uppercase">Penjelasan Formula Rumus:</h4>
+                        <p id="conv-formula-text" class="text-xs text-emerald-800 mt-1 font-mono">
+                            (100°C × 9/5) + 32 = 212°F
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- -------------------------------------- -->
+        <!-- FITUR 4: MOTIVASI & BRAIN TEASER       -->
+        <!-- -------------------------------------- -->
+        <section id="quotes" class="tab-content">
+            <div class="max-w-4xl mx-auto space-y-6">
+                
+                <!-- Card Quote Motivasi -->
+                <div class="bg-gradient-to-br from-amber-500 via-orange-500 to-rose-500 text-white p-6 sm:p-8 rounded-3xl shadow-lg relative overflow-hidden flex flex-col justify-between min-h-[220px]">
+                    <i class="fa-solid fa-quote-right absolute -bottom-6 -right-6 text-white/10 text-9xl"></i>
+                    
+                    <div class="relative z-10 space-y-3">
+                        <span class="px-3 py-1 bg-white/20 backdrop-blur-md text-white rounded-full text-[10px] font-bold uppercase tracking-wider">
+                            ✨ Quote Motivasi Belajar
+                        </span>
+                        <p id="quote-text" class="text-lg sm:text-xl font-extrabold italic leading-relaxed">
+                            "Pendidikan adalah senjata paling mematikan di dunia, karena dengan pendidikan Anda dapat mengubah dunia."
+                        </p>
+                        <p id="quote-author" class="text-xs font-semibold text-amber-100">
+                            — Nelson Mandela
+                        </p>
+                    </div>
+
+                    <div class="relative z-10 flex items-center gap-3 pt-6 border-t border-white/20 mt-4">
+                        <button onclick="getRandomQuote()" class="px-4 py-2 bg-white text-slate-800 font-bold text-xs rounded-xl shadow hover:bg-amber-50 transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-shuffle text-amber-600"></i> Acak Quote
+                        </button>
+                        <button onclick="copyQuote()" class="px-4 py-2 bg-white/20 hover:bg-white/30 text-white font-bold text-xs rounded-xl backdrop-blur-md transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-copy"></i> Salin Teks
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Card Brain Teaser Teka-Teki Sains -->
+                <div class="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-sm space-y-5">
+                    <div class="flex justify-between items-center">
+                        <span class="px-3 py-1 bg-purple-50 text-purple-600 rounded-full text-xs font-bold uppercase tracking-wider">
+                            🧩 Asah Otak Sains
+                        </span>
+                        <button onclick="getRandomTeaser()" class="text-xs font-bold text-purple-600 hover:text-purple-700 flex items-center gap-1">
+                            <i class="fa-solid fa-rotate"></i> Teka-Teki Lainnya
+                        </button>
+                    </div>
+
+                    <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200">
+                        <h3 id="teaser-question" class="text-base font-bold text-slate-800">
+                            Apa benda yang makin basah semakin ia mengeringkan?
+                        </h3>
+                    </div>
+
+                    <!-- Area Jawaban (Toggle) -->
+                    <div class="space-y-3">
+                        <button onclick="toggleAnswer()" id="btn-show-answer" class="w-full py-3 bg-purple-100 hover:bg-purple-200 text-purple-800 font-bold text-xs rounded-xl transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-eye"></i> Tampilkan Jawaban
+                        </button>
+
+                        <div id="teaser-answer-box" class="hidden p-4 bg-purple-50 rounded-2xl border border-purple-200 text-center animate-fadeIn">
+                            <span class="text-[10px] font-bold text-purple-400 uppercase tracking-wider block">Jawaban:</span>
+                            <p id="teaser-answer-text" class="text-sm font-extrabold text-purple-900 mt-0.5">
+                                Handuk!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal Selebrasi Game Memory -->
+    <div id="win-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white p-6 sm:p-8 rounded-3xl max-w-sm w-full text-center space-y-4 shadow-2xl">
+            <div class="w-16 h-16 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mx-auto text-3xl">
+                🏆
+            </div>
+            <h3 class="text-xl font-extrabold text-slate-800">Selamat! Kamu Menang!</h3>
+            <p class="text-xs text-slate-500 leading-relaxed">
+                Kamu berhasil mencocokkan semua kartu dalam <span id="win-moves" class="font-bold text-slate-800">0</span> langkah dan waktu <span id="win-time" class="font-bold text-purple-600">00:00</span>.
+            </p>
+            <button onclick="closeWinModal()" class="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs rounded-xl shadow-md transition">
+                Main Lagi
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast Notification (Salin Teks) -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-800 text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-xl transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-2">
+        <i class="fa-solid fa-circle-check text-emerald-400"></i> Teks berhasil disalin!
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- LOGIKA JAVASCRIPT (VANILLA JS)             -->
+    <!-- ========================================== -->
+    <script>
+        /* ----------------------------------------------------
+           1. LOGIKA NAVIGASI TAB UTAMA
+        ---------------------------------------------------- */
+        function switchTab(tabId) {
+            // Sembunyikan semua tab
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            // Tampilkan tab target
+            document.getElementById(tabId).classList.add('active');
+
+            // Style navigasi button
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-white', 'text-indigo-600', 'shadow-sm');
+                btn.classList.add('text-slate-600');
+            });
+
+            const activeBtn = document.getElementById('nav-' + tabId);
+            activeBtn.classList.add('bg-white', 'text-indigo-600', 'shadow-sm');
+            activeBtn.classList.remove('text-slate-600');
+
+            // Trigger canvas redraw saat tab pendulum diaktifkan
+            if (tabId === 'pendulum') {
+                resizeCanvas();
+            }
+        }
+
+
+        /* ----------------------------------------------------
+           2. FITUR 1: SIMULATOR AYUNAN BANDUL (CANVAS)
+        ---------------------------------------------------- */
+        const canvas = document.getElementById('pendulumCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Parameter Fisika Default
+        let length = 1.5;   // Panjang Tali (meter)
+        let mass = 10;      // Massa Beban (kg)
+        let gravity = 9.8;  // Percepatan Gravitasi (m/s²)
+        
+        let angle = Math.PI / 4; // Sudut Awal 45 Derajat
+        let angleVelocity = 0;
+        let angleAcceleration = 0;
+        let isPaused = false;
+
+        function resizeCanvas() {
+            if (!canvas) return;
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+        }
+
+        // Listener Event Slider
+        document.getElementById('slider-length').addEventListener('input', (e) => {
+            length = parseFloat(e.target.value);
+            document.getElementById('val-length').textContent = `${length.toFixed(1)} m`;
+            updatePendulumPhysics();
+        });
+
+        document.getElementById('slider-mass').addEventListener('input', (e) => {
+            mass = parseFloat(e.target.value);
+            document.getElementById('val-mass').textContent = `${mass} kg`;
+            updatePendulumPhysics();
+        });
+
+        function setGravity(val, name, btn) {
+            gravity = val;
+            document.querySelectorAll('.btn-gravity').forEach(b => {
+                b.classList.remove('active', 'bg-indigo-50', 'border-indigo-200', 'text-indigo-700');
+                b.classList.add('border-slate-200', 'text-slate-700');
+            });
+            btn.classList.add('active', 'bg-indigo-50', 'border-indigo-200', 'text-indigo-700');
+            updatePendulumPhysics();
+        }
+
+        function updatePendulumPhysics() {
+            // Rumus Periode T = 2 * PI * sqrt(L / g)
+            const period = 2 * Math.PI * Math.sqrt(length / gravity);
+            const frequency = 1 / period;
+
+            document.getElementById('res-period').textContent = `${period.toFixed(2)} s`;
+            document.getElementById('res-frequency').textContent = `${frequency.toFixed(2)} Hz`;
+        }
+
+        function togglePendulumPause() {
+            isPaused = !isPaused;
+            const btn = document.getElementById('btn-pause-pendulum');
+            btn.innerHTML = isPaused ? '<i class="fa-solid fa-play"></i> Lanjut' : '<i class="fa-solid fa-pause"></i> Pause';
+        }
+
+        function resetPendulum() {
+            angle = Math.PI / 4;
+            angleVelocity = 0;
+            angleAcceleration = 0;
+            isPaused = false;
+            document.getElementById('btn-pause-pendulum').innerHTML = '<i class="fa-solid fa-pause"></i> Pause';
+        }
+
+        function drawPendulum() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Origin titik gantung
+            const originX = canvas.width / 2;
+            const originY = 40;
+
+            // Skala piksel berdasarkan panjang tali
+            const pixelLength = length * 75;
+
+            // Hitung koordinat (x, y) ujung beban
+            const bobX = originX + pixelLength * Math.sin(angle);
+            const bobY = originY + pixelLength * Math.cos(angle);
+
+            // Update Physics Acceleration (Persamaan Gerak Bandul)
+            if (!isPaused) {
+                // Rumus Percepatan Sudut: a = (-1 * g / L) * sin(theta)
+                angleAcceleration = (-1 * (gravity / 10) / length) * Math.sin(angle);
+                angleVelocity += angleAcceleration;
+                angle += angleVelocity;
+                
+                // Redaman udara ringan (Damping)
+                angleVelocity *= 0.999;
+            }
+
+            // Display Nilai Sudut Real-Time
+            const angleInDegrees = (angle * (180 / Math.PI)).toFixed(1);
+            document.getElementById('val-angle-display').textContent = `${angleInDegrees}°`;
+
+            // Gambar Garis Stand Pivot Pas
+            ctx.strokeStyle = '#475569';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(originX - 40, originY);
+            ctx.lineTo(originX + 40, originY);
+            ctx.stroke();
+
+            // Gambar Tali Bandul
+            ctx.strokeStyle = '#94a3b8';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(originX, originY);
+            ctx.lineTo(bobX, bobY);
+            ctx.stroke();
+
+            // Gambar Beban (Bob)
+            const radius = Math.min(Math.max(mass * 0.8 + 8, 12), 28);
+            ctx.fillStyle = '#6366f1';
+            ctx.beginPath();
+            ctx.arc(bobX, bobY, radius, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#818cf8';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // Loop Animasi
+            requestAnimationFrame(drawPendulum);
+        }
+
+
+        /* ----------------------------------------------------
+           3. FITUR 2: GAME MEMORY MATCH CARD
+        ---------------------------------------------------- */
+        const memorySymbols = [
+            { icon: 'fa-atom', color: 'text-indigo-500' },
+            { icon: 'fa-dna', color: 'text-emerald-500' },
+            { icon: 'fa-microscope', color: 'text-cyan-500' },
+            { icon: 'fa-globe', color: 'text-amber-500' },
+            { icon: 'fa-calculator', color: 'text-purple-500' },
+            { icon: 'fa-laptop-code', color: 'text-rose-500' },
+            { icon: 'fa-book-open', color: 'text-blue-500' },
+            { icon: 'fa-star', color: 'text-yellow-500' }
+        ];
+
+        let memoryCards = [];
+        let flippedCards = [];
+        let matchedPairs = 0;
+        let moves = 0;
+        let gameTimer = null;
+        let secondsElapsed = 0;
+        let isBoardLocked = false;
+
+        function initMemoryGame() {
+            const grid = document.getElementById('memory-grid');
+            grid.innerHTML = '';
+            flippedCards = [];
+            matchedPairs = 0;
+            moves = 0;
+            secondsElapsed = 0;
+            isBoardLocked = false;
+
+            document.getElementById('memory-moves').textContent = '0';
+            document.getElementById('memory-timer').textContent = '00:00';
+            
+            clearInterval(gameTimer);
+            gameTimer = setInterval(updateTimer, 1000);
+
+            // Duplikasi simbol & acak posisi
+            const deck = [...memorySymbols, ...memorySymbols]
+                .sort(() => Math.random() - 0.5);
+
+            deck.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'memory-card h-24 sm:h-28 cursor-pointer';
+                card.dataset.symbol = item.icon;
+                card.innerHTML = `
+                    <div class="memory-card-inner">
+                        <div class="memory-card-front bg-slate-100 border-2 border-slate-200/80 shadow-sm hover:border-purple-300 transition">
+                            <i class="fa-solid fa-question text-slate-400 text-xl"></i>
+                        </div>
+                        <div class="memory-card-back bg-white border-2 border-purple-400 shadow-md">
+                            <i class="fa-solid ${item.icon} ${item.color} text-3xl"></i>
+                        </div>
+                    </div>
+                `;
+                card.addEventListener('click', () => flipCard(card));
+                grid.appendChild(card);
+            });
+        }
+
+        function flipCard(card) {
+            if (isBoardLocked || card.classList.contains('flipped') || card.classList.contains('matched')) return;
+
+            card.classList.add('flipped');
+            flippedCards.push(card);
+
+            if (flippedCards.length === 2) {
+                moves++;
+                document.getElementById('memory-moves').textContent = moves;
+                checkMatch();
+            }
+        }
+
+        function checkMatch() {
+            isBoardLocked = true;
+            const [card1, card2] = flippedCards;
+
+            if (card1.dataset.symbol === card2.dataset.symbol) {
+                card1.classList.add('matched');
+                card2.classList.add('matched');
+                matchedPairs++;
+                flippedCards = [];
+                isBoardLocked = false;
+
+                if (matchedPairs === memorySymbols.length) {
+                    clearInterval(gameTimer);
+                    setTimeout(showWinModal, 500);
+                }
+            } else {
+                setTimeout(() => {
+                    card1.classList.remove('flipped');
+                    card2.classList.remove('flipped');
+                    flippedCards = [];
+                    isBoardLocked = false;
+                }, 900);
+            }
+        }
+
+        function updateTimer() {
+            secondsElapsed++;
+            const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+            const secs = String(secondsElapsed % 60).padStart(2, '0');
+            document.getElementById('memory-timer').textContent = `${mins}:${secs}`;
+        }
+
+        function showWinModal() {
+            document.getElementById('win-moves').textContent = moves;
+            document.getElementById('win-time').textContent = document.getElementById('memory-timer').textContent;
+            document.getElementById('win-modal').classList.remove('hidden');
+            document.getElementById('win-modal').classList.add('flex');
+        }
+
+        function closeWinModal() {
+            document.getElementById('win-modal').classList.add('hidden');
+            document.getElementById('win-modal').classList.remove('flex');
+            initMemoryGame();
+        }
+
+
+        /* ----------------------------------------------------
+           4. FITUR 3: KONVERTER SATUAN & SAINS
+        ---------------------------------------------------- */
+        let currentConvMode = 'temp';
+
+        const convUnits = {
+            temp: [
+                { id: 'C', name: 'Celsius (°C)' },
+                { id: 'F', name: 'Fahrenheit (°F)' },
+                { id: 'K', name: 'Kelvin (K)' },
+                { id: 'R', name: 'Reamur (°R)' }
+            ],
+            data: [
+                { id: 'B', name: 'Byte (B)' },
+                { id: 'KB', name: 'Kilobyte (KB)' },
+                { id: 'MB', name: 'Megabyte (MB)' },
+                { id: 'GB', name: 'Gigabyte (GB)' },
+                { id: 'TB', name: 'Terabyte (TB)' }
+            ],
+            speed: [
+                { id: 'kmh', name: 'km/jam' },
+                { id: 'ms', name: 'm/detik' },
+                { id: 'mph', name: 'Mil/jam' }
+            ],
+            length: [
+                { id: 'm', name: 'Meter (m)' },
+                { id: 'km', name: 'Kilometer (km)' },
+                { id: 'cm', name: 'Centimeter (cm)' },
+                { id: 'inch', name: 'Inci (in)' }
+            ]
+        };
+
+        function setConverterMode(mode) {
+            currentConvMode = mode;
+            document.querySelectorAll('.conv-tab-btn').forEach(b => {
+                b.classList.remove('bg-emerald-500', 'text-white', 'shadow-sm');
+                b.classList.add('text-slate-600');
+            });
+
+            const activeBtn = document.getElementById(`btn-conv-${mode}`);
+            activeBtn.classList.add('bg-emerald-500', 'text-white', 'shadow-sm');
+            activeBtn.classList.remove('text-slate-600');
+
+            populateUnitOptions();
+            runConversion();
+        }
+
+        function populateUnitOptions() {
+            const selectFrom = document.getElementById('conv-unit-from');
+            const selectTo = document.getElementById('conv-unit-to');
+            
+            selectFrom.innerHTML = '';
+            selectTo.innerHTML = '';
+
+            convUnits[currentConvMode].forEach((unit, idx) => {
+                selectFrom.add(new Option(unit.name, unit.id, idx === 0, idx === 0));
+                selectTo.add(new Option(unit.name, unit.id, idx === 1, idx === 1));
+            });
+        }
+
+        function runConversion() {
+            const inputVal = parseFloat(document.getElementById('conv-input').value) || 0;
+            const from = document.getElementById('conv-unit-from').value;
+            const to = document.getElementById('conv-unit-to').value;
+            
+            let result = 0;
+            let formula = '';
+
+            if (currentConvMode === 'temp') {
+                // Konversi Suhu
+                let celsius = inputVal;
+                if (from === 'F') celsius = (inputVal - 32) * 5/9;
+                else if (from === 'K') celsius = inputVal - 273.15;
+                else if (from === 'R') celsius = inputVal * 5/4;
+
+                if (to === 'C') { result = celsius; formula = `${inputVal}° ${from} = ${result.toFixed(2)}°C`; }
+                else if (to === 'F') { result = (celsius * 9/5) + 32; formula = `(${celsius.toFixed(1)}°C × 9/5) + 32 = ${result.toFixed(2)}°F`; }
+                else if (to === 'K') { result = celsius + 273.15; formula = `${celsius.toFixed(1)}°C + 273.15 = ${result.toFixed(2)}K`; }
+                else if (to === 'R') { result = celsius * 4/5; formula = `${celsius.toFixed(1)}°C × 4/5 = ${result.toFixed(2)}°R`; }
+            } 
+            else if (currentConvMode === 'data') {
+                // Konversi Data (Factor 1024)
+                const factors = { B: 1, KB: 1024, MB: 1024**2, GB: 1024**3, TB: 1024**4 };
+                const bytes = inputVal * factors[from];
+                result = bytes / factors[to];
+                formula = `${inputVal} ${from} × (${factors[from]} / ${factors[to]}) = ${result.toLocaleString()} ${to}`;
+            }
+            else if (currentConvMode === 'speed') {
+                // Kecepatan
+                const msValues = { kmh: inputVal / 3.6, ms: inputVal, mph: inputVal / 2.237 };
+                const baseMS = msValues[from];
+                if (to === 'kmh') result = baseMS * 3.6;
+                else if (to === 'ms') result = baseMS;
+                else if (to === 'mph') result = baseMS * 2.237;
+                formula = `1 ${from} ke ${to} = ${(result / (inputVal || 1)).toFixed(4)} multiplier`;
+            }
+            else if (currentConvMode === 'length') {
+                // Panjang
+                const metersValues = { m: inputVal, km: inputVal * 1000, cm: inputVal / 100, inch: inputVal * 0.0254 };
+                const baseMeters = metersValues[from];
+                if (to === 'm') result = baseMeters;
+                else if (to === 'km') result = baseMeters / 1000;
+                else if (to === 'cm') result = baseMeters * 100;
+                else if (to === 'inch') result = baseMeters / 0.0254;
+                formula = `Nilai dasar dalam meter: ${baseMeters.toFixed(4)} m`;
+            }
+
+            document.getElementById('conv-output').textContent = Number.isInteger(result) ? result : result.toFixed(3);
+            document.getElementById('conv-formula-text').textContent = formula;
+        }
+
+
+        /* ----------------------------------------------------
+           5. FITUR 4: MOTIVASI & BRAIN TEASER
+        ---------------------------------------------------- */
+        const quotesList = [
+            { quote: "Pendidikan adalah senjata paling mematikan di dunia, karena dengan pendidikan Anda dapat mengubah dunia.", author: "Nelson Mandela" },
+            { quote: "Agama tanpa ilmu adalah buta. Ilmu tanpa agama adalah lumpuh.", author: "Albert Einstein" },
+            { quote: "Hiduplah seolah-olah kamu akan mati besok. Belajarlah seolah-olah kamu akan hidup selamanya.", author: "Mahatma Gandhi" },
+            { quote: "Investasi dalam pengetahuan selalu membayar bunga terbaik.", author: "Benjamin Franklin" },
+            { quote: "Tujuan utama pendidikan bukan hanya pengetahuan, tetapi tindakan.", author: "Herbert Spencer" }
+        ];
+
+        const teasersList = [
+            { q: "Apa benda yang makin basah semakin ia mengeringkan?", a: "Handuk!" },
+            { q: "Jika ada 3 burung di atas pohon dan pemburu menembak 1, berapa sisa burung di pohon?", a: "0 burung! Karena sisanya kabur terbang mendengar suara tembakan." },
+            { q: "Planet mana yang memiliki waktu satu hari lebih lama daripada satu tahunnya?", a: "Planet Venus! Rotasinya sangat lambat." },
+            { q: "Unsur kimia apa yang paling melimpah di alam semesta?", a: "Hidrogen (H)!" },
+            { q: "Siapakah ilmuwan penemu hukum gravitasi setelah tertimpa buah apel?", a: "Sir Isaac Newton!" }
+        ];
+
+        let currentTeaserIndex = 0;
+
+        function getRandomQuote() {
+            const random = quotesList[Math.floor(Math.random() * quotesList.length)];
+            document.getElementById('quote-text').textContent = `"${random.quote}"`;
+            document.getElementById('quote-author').textContent = `— ${random.author}`;
+        }
+
+        function copyQuote() {
+            const text = `${document.getElementById('quote-text').textContent} ${document.getElementById('quote-author').textContent}`;
+            
+            // Menggunakan execCommand sesuai standard iframe UI
+            const dummy = document.createElement("textarea");
+            document.body.appendChild(dummy);
+            dummy.value = text;
+            dummy.select();
+            document.execCommand("copy");
+            document.body.removeChild(dummy);
+
+            // Toast feedback
+            const toast = document.getElementById('toast');
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 2500);
+        }
+
+        function getRandomTeaser() {
+            currentTeaserIndex = (currentTeaserIndex + 1) % teasersList.length;
+            const item = teasersList[currentTeaserIndex];
+            
+            document.getElementById('teaser-question').textContent = item.q;
+            document.getElementById('teaser-answer-text').textContent = item.a;
+            
+            // Hide answer box
+            document.getElementById('teaser-answer-box').classList.add('hidden');
+            document.getElementById('btn-show-answer').innerHTML = '<i class="fa-solid fa-eye"></i> Tampilkan Jawaban';
+        }
+
+        function toggleAnswer() {
+            const answerBox = document.getElementById('teaser-answer-box');
+            const btn = document.getElementById('btn-show-answer');
+
+            if (answerBox.classList.contains('hidden')) {
+                answerBox.classList.remove('hidden');
+                btn.innerHTML = '<i class="fa-solid fa-eye-slash"></i> Sembunyikan Jawaban';
+            } else {
+                answerBox.classList.add('hidden');
+                btn.innerHTML = '<i class="fa-solid fa-eye"></i> Tampilkan Jawaban';
+            }
+        }
+
+
+        /* ----------------------------------------------------
+           INISIALISASI SAAT HALAMAN DIBUKA
+        ---------------------------------------------------- */
+        window.onload = function() {
+            resizeCanvas();
+            updatePendulumPhysics();
+            drawPendulum();
+            initMemoryGame();
+            setConverterMode('temp');
+            
+            // Listener Resize Window untuk Canvas Responsif
+            window.addEventListener('resize', resizeCanvas);
+        };
+    </script>
+</body>
+</html>

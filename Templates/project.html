@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Project{% endblock %}
+{% block content %}
+
+    <header class="project-header">
+        <h1>MY PROJECTS</h1>
+        <p>Berikut adalah beberapa project yang pernah saya buat.</p>
+    </header>
+    
+    <main class="project-gallery">
+        <div class="project-card">
+            <img src="{{ url_for('static', filename='images/project.png') }}" alt="">
+            <div class="project-content">
+                <h2>Edulab Interactive Simulation Suite</h2>
+                <p>Aplikasi sederhana pencatat data nilai siswa, penghitung kelulusan dan rata-rata nilai siswa</p>
+                <a href="{{ url_for('edulab') }}">View Project</a>
+            </div>
+        </div>
+
+        <div class="project-card">
+            <img src="{{ url_for('static', filename='images/project.png') }}" alt="">
+            <div class="project-content">
+                <h2>EduHub Creative Suite Pelajar</h2>
+                <p>Aplikasi untuk mencatat keuangan, saldo, pendapatan dan pengeluaran</p>
+                <a href="{{ url_for('eduhub') }}" class="project-card">
+    View Project
+</a>
+            </div>
+        </div>
+        
+        <div class="project-card">
+            <img src="{{ url_for('static', filename='images/project.png') }}" alt="">
+            <div class="project-content">
+                <h2>Taskschol Dashboard</h2>
+                <p>Aplikasi sederhana untuk mencatat dan mengelola aktivitas sehari-hari.</p>
+                <a href="{{ url_for('taskschool_dashboard') }}">View Project</a>
+            </div>
+        </div>
+    </main>
+
+
+{% endblock %}

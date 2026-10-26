@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TaskSchool — Dashboard Tugas</title>
+<style>
+:root{--bg:#f4f6fb;--card:#fff;--ink:#182033;--muted:#718096;--line:#e7ebf3;--blue:#536dfe;--purple:#8065e8;--green:#159b72;--orange:#e79532;--red:#df5663;--shadow:0 10px 30px rgba(34,48,80,.07)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,system-ui,-apple-system,Segoe UI,sans-serif}
+.app{max-width:1250px;margin:auto;padding:28px 22px 50px}.top{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:25px}.brand{display:flex;align-items:center;gap:12px}.logo{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,var(--blue),var(--purple));display:grid;place-items:center;color:white;font-size:23px}.brand h1{font-size:21px;margin:0}.brand p{margin:2px 0 0;color:var(--muted);font-size:13px}.today{color:var(--muted);font-size:13px;text-align:right}
+.welcome{background:linear-gradient(115deg,#536dfe,#8065e8);color:white;border-radius:22px;padding:26px 28px;margin-bottom:22px;display:flex;justify-content:space-between;align-items:center;gap:18px;box-shadow:var(--shadow)}.welcome h2{font-size:25px;margin:0 0 5px}.welcome p{margin:0;color:#e9eaff}.welcome .date-pill{background:#ffffff24;padding:10px 14px;border:1px solid #ffffff40;border-radius:12px;white-space:nowrap;font-size:13px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}.stat,.panel{background:var(--card);border:1px solid var(--line);border-radius:17px;box-shadow:var(--shadow)}.stat{padding:17px 18px}.stat-top{display:flex;justify-content:space-between;color:var(--muted);font-size:13px}.stat-icon{font-size:19px}.stat strong{display:block;font-size:29px;margin-top:8px}.stat small{color:var(--muted)}
+.layout{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,.85fr);gap:18px}.panel{padding:20px;margin-bottom:18px}.panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:16px}.panel h3{font-size:17px;margin:0}.muted{color:var(--muted);font-size:13px}
+button,input,select,textarea{font:inherit}button{cursor:pointer;border:0;border-radius:10px;padding:10px 14px;font-weight:650}.primary{background:var(--blue);color:white}.soft{background:#eef1ff;color:var(--blue)}.danger{background:#fff0f1;color:var(--red)}.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:15px}.filters select,.filters input{background:#f8f9fc;border:1px solid var(--line);border-radius:9px;padding:9px 10px;color:var(--ink);min-width:0}
+.task-list{display:grid;gap:10px}.task{border:1px solid var(--line);border-radius:13px;padding:14px;display:grid;grid-template-columns:1fr auto;gap:12px}.task-title{font-weight:700;margin-bottom:5px}.task-meta{display:flex;gap:9px;flex-wrap:wrap;color:var(--muted);font-size:12px}.tag{font-size:11px;font-weight:700;border-radius:30px;padding:4px 9px;display:inline-block}.tag.todo{background:#eef1ff;color:#536dfe}.tag.progress{background:#fff4e5;color:#b97819}.tag.done{background:#e7f8f1;color:#13845f}.tag.late{background:#fff0f1;color:#d34b59}.task-actions{display:flex;align-items:center;gap:6px}.icon-btn{padding:7px 9px;background:#f4f6fa;color:#526078}.empty{text-align:center;padding:30px 12px;color:var(--muted)}.progress-track{height:8px;background:#edf0f6;border-radius:20px;overflow:hidden;margin-top:8px}.progress-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--purple));border-radius:20px}
+.upcoming{display:grid;gap:12px}.up-item{border-left:3px solid var(--blue);padding:2px 0 2px 11px}.up-item strong{font-size:13px;display:block}.up-item span{font-size:12px;color:var(--muted)}.progress-summary{display:flex;align-items:center;gap:16px}.ring{width:88px;height:88px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--blue) var(--pct),#edf0f6 0);position:relative;flex:none}.ring:before{content:"";position:absolute;inset:8px;border-radius:50%;background:white}.ring b{position:relative;font-size:18px}.legend{display:grid;gap:7px;font-size:12px;color:var(--muted)}.legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px}
+.modal{position:fixed;inset:0;background:#17203380;display:none;place-items:center;padding:18px;z-index:5}.modal.show{display:grid}.dialog{background:white;border-radius:18px;padding:22px;width:min(100%,510px);max-height:92vh;overflow:auto;box-shadow:0 20px 70px #0003}.dialog h2{margin:0 0 17px;font-size:20px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:grid;gap:5px}.field.full{grid-column:1/-1}.field label{font-size:12px;font-weight:700;color:#58647a}.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);background:#fafbfe;border-radius:9px;padding:10px;color:var(--ink)}.dialog-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#202b40;color:white;padding:11px 17px;border-radius:10px;display:none;z-index:10}
+@media(max-width:850px){.stats{grid-template-columns:repeat(2,1fr)}.layout{grid-template-columns:1fr}}@media(max-width:520px){.app{padding:18px 13px 35px}.welcome{padding:21px;align-items:flex-start;flex-direction:column}.welcome h2{font-size:21px}.top{align-items:flex-start}.today{max-width:120px}.task{grid-template-columns:1fr}.task-actions{justify-content:flex-end}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.stat{padding:14px}.stat strong{font-size:25px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand"><div class="logo">✓</div><div><h1>TaskSchool</h1><p>Dashboard tugas sekolahmu</p></div></div>
+    <div class="today" id="todayText"></div>
+  </header>
+  <section class="welcome">
+    <div><h2>Halo! Siap menyelesaikan tugas? 📚</h2><p>Atur waktu pengerjaan dan pantau deadline agar tidak terlewat.</p></div>
+    <div class="date-pill" id="welcomeDate"></div>
+  </section>
+  <section class="stats">
+    <div class="stat"><div class="stat-top">Total tugas <span class="stat-icon">📒</span></div><strong id="totalCount">0</strong><small>Semua tugas tercatat</small></div>
+    <div class="stat"><div class="stat-top">Belum dikerjakan <span class="stat-icon">📝</span></div><strong id="todoCount">0</strong><small>Menunggu untuk dimulai</small></div>
+    <div class="stat"><div class="stat-top">Sedang dikerjakan <span class="stat-icon">⏳</span></div><strong id="progressCount">0</strong><small>Tugas dalam proses</small></div>
+    <div class="stat"><div class="stat-top">Sudah selesai <span class="stat-icon">🎉</span></div><strong id="doneCount">0</strong><small>Kerja bagus!</small></div>
+  </section>
+  <div class="layout">
+    <main>
+      <section class="panel">
+        <div class="panel-head"><div><h3>Daftar Tugas</h3><div class="muted">Kelola semua tugas dan deadline</div></div><button class="primary" id="addBtn">＋ Tambah tugas</button></div>
+        <div class="filters">
+          <input id="searchInput" type="search" placeholder="Cari tugas atau mapel…" aria-label="Cari tugas"/>
+          <select id="statusFilter" aria-label="Filter status"><option value="all">Semua status</option><option value="Belum dimulai">Belum dimulai</option><option value="Sedang dikerjakan">Sedang dikerjakan</option><option value="Selesai">Selesai</option></select>
+          <select id="sortFilter" aria-label="Urutkan"><option value="deadline">Deadline terdekat</option><option value="start">Tanggal mulai</option><option value="name">Nama tugas</option></select>
+        </div>
+        <div class="task-list" id="taskList"></div>
+      </section>
+    </main>
+    <aside>
+      <section class="panel">
+        <div class="panel-head"><h3>Ringkasan progres</h3></div>
+        <div class="progress-summary"><div class="ring" id="progressRing" style="--pct:0%"><b id="progressPercent">0%</b></div><div class="legend"><div><i style="background:#536dfe"></i>Belum dimulai</div><div><i style="background:#e79532"></i>Sedang dikerjakan</div><div><i style="background:#159b72"></i>Selesai</div></div></div>
+      </section>
+      <section class="panel">
+        <div class="panel-head"><h3>Deadline terdekat</h3><span>📅</span></div>
+        <div class="upcoming" id="upcomingList"></div>
+      </section>
+      <section class="panel">
+        <h3 style="margin-bottom:8px">Tips belajar 💡</h3>
+        <div class="muted">Mulai tugas lebih awal, pecah tugas besar menjadi beberapa bagian, dan sisakan waktu untuk memeriksa jawaban sebelum dikumpulkan.</div>
+      </section>
+    </aside>
+  </div>
+</div>
+<div class="modal" id="taskModal">
+ <form class="dialog" id="taskForm">
+  <h2 id="modalTitle">Tambah tugas baru</h2>
+  <input type="hidden" id="taskId"/>
+  <div class="form-grid">
+   <div class="field full"><label for="taskName">Nama tugas *</label><input id="taskName" required maxlength="90" placeholder="Contoh: Makalah ekosistem"/></div>
+   <div class="field"><label for="subject">Mata pelajaran *</label><input id="subject" required placeholder="Contoh: IPA"/></div>
+   <div class="field"><label for="status">Status</label><select id="status"><option>Belum dimulai</option><option>Sedang dikerjakan</option><option>Selesai</option></select></div>
+   <div class="field"><label for="startDate">Tanggal mulai pengerjaan *</label><input id="startDate" type="date" required/></div>
+   <div class="field"><label for="deadline">Deadline *</label><input id="deadline" type="date" required/></div>
+   <div class="field full"><label for="notes">Catatan (opsional)</label><textarea id="notes" rows="3" placeholder="Bab yang dikerjakan, link materi, dll."></textarea></div>
+  </div>
+  <div class="dialog-actions"><button type="button" class="soft" id="cancelBtn">Batal</button><button class="primary" type="submit">Simpan tugas</button></div>
+ </form>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const $=id=>document.getElementById(id);
+const STORAGE_KEY='taskschool_tasks_v1';
+let tasks=[];
+try{tasks=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');if(!Array.isArray(tasks))tasks=[];}catch{tasks=[];}
+const todayISO=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
+const dateObj=s=>new Date(s+'T00:00:00');
+const fmt=s=>dateObj(s).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'});
+const dayDiff=s=>Math.round((dateObj(s)-dateObj(todayISO()))/86400000);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(tasks));render()}
+function toast(msg){$('toast').textContent=msg;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',2200)}
+function statusTag(t){if(t.status==='Selesai')return '<span class="tag done">Selesai</span>';if(dayDiff(t.deadline)<0)return '<span class="tag late">Terlambat</span>';if(t.status==='Sedang dikerjakan')return '<span class="tag progress">Sedang dikerjakan</span>';return '<span class="tag todo">Belum dimulai</span>'}
+function remaining(t){if(t.status==='Selesai')return 'Sudah selesai';let n=dayDiff(t.deadline);return n<0?`Terlambat ${Math.abs(n)} hari`:n===0?'Deadline hari ini':`${n} hari lagi`}
+function render(){
+ const total=tasks.length,done=tasks.filter(t=>t.status==='Selesai').length,prog=tasks.filter(t=>t.status==='Sedang dikerjakan').length,todo=tasks.filter(t=>t.status==='Belum dimulai').length,pct=total?Math.round(done/total*100):0;
+ $('totalCount').textContent=total;$('todoCount').textContent=todo;$('progressCount').textContent=prog;$('doneCount').textContent=done;$('progressPercent').textContent=pct+'%';$('progressRing').style.setProperty('--pct',pct+'%');
+ const q=$('searchInput').value.toLowerCase(),filter=$('statusFilter').value,sort=$('sortFilter').value;
+ let shown=tasks.filter(t=>(t.name+' '+t.subject+' '+(t.notes||'')).toLowerCase().includes(q)&&(filter==='all'||t.status===filter));
+ shown.sort((a,b)=>sort==='name'?a.name.localeCompare(b.name):sort==='start'?a.start.localeCompare(b.start):a.deadline.localeCompare(b.deadline));
+ $('taskList').innerHTML=shown.length?shown.map(t=>`<article class="task"><div><div class="task-title">${esc(t.name)}</div><div class="task-meta"><span>📘 ${esc(t.subject)}</span><span>Mulai: ${fmt(t.start)}</span><span>Deadline: ${fmt(t.deadline)}</span><span>⏱ ${remaining(t)}</span></div>${t.notes?`<div class="muted" style="margin-top:7px">${esc(t.notes)}</div>`:''}<div style="margin-top:9px">${statusTag(t)}</div></div><div class="task-actions"><button class="icon-btn" title="Ubah status" data-action="next" data-id="${t.id}">↻</button><button class="icon-btn" title="Edit" data-action="edit" data-id="${t.id}">✎</button><button class="icon-btn" title="Hapus" data-action="delete" data-id="${t.id}">🗑</button></div></article>`).join(''):'<div class="empty">📚<br><strong>Belum ada tugas yang cocok.</strong><br><span class="muted">Tambahkan tugas pertamamu dengan tombol di atas.</span></div>';
+ const upcoming=tasks.filter(t=>t.status!=='Selesai').sort((a,b)=>a.deadline.localeCompare(b.deadline)).slice(0,5);
+ $('upcomingList').innerHTML=upcoming.length?upcoming.map(t=>`<div class="up-item"><strong>${esc(t.name)}</strong><span>${esc(t.subject)} · ${fmt(t.deadline)} · ${remaining(t)}</span></div>`).join(''):'<div class="muted">Tidak ada deadline aktif. Mantap!</div>';
+}
+function openModal(t=null){$('taskForm').reset();$('taskId').value=t?.id||'';$('modalTitle').textContent=t?'Edit tugas':'Tambah tugas baru';$('taskName').value=t?.name||'';$('subject').value=t?.subject||'';$('status').value=t?.status||'Belum dimulai';$('startDate').value=t?.start||todayISO();$('deadline').value=t?.deadline||todayISO();$('notes').value=t?.notes||'';$('taskModal').classList.add('show')}
+function closeModal(){$('taskModal').classList.remove('show')}
+$('addBtn').onclick=()=>openModal();$('cancelBtn').onclick=closeModal;
+$('taskModal').addEventListener('click',e=>{if(e.target===$('taskModal'))closeModal()});
+$('taskForm').addEventListener('submit',e=>{e.preventDefault();const start=$('startDate').value,deadline=$('deadline').value;if(deadline<start){toast('Deadline tidak boleh sebelum tanggal mulai.');return}const id=$('taskId').value;const item={id:id||String(Date.now()),name:$('taskName').value.trim(),subject:$('subject').value.trim(),status:$('status').value,start,deadline,notes:$('notes').value.trim()};if(id){tasks=tasks.map(t=>t.id===id?item:t)}else tasks.push(item);save();closeModal();toast(id?'Tugas berhasil diperbarui':'Tugas berhasil ditambahkan')});
+$('taskList').addEventListener('click',e=>{const b=e.target.closest('button[data-action]');if(!b)return;const t=tasks.find(x=>x.id===b.dataset.id);if(!t)return;if(b.dataset.action==='edit')openModal(t);if(b.dataset.action==='delete'){if(confirm(`Hapus tugas "${t.name}"?`)){tasks=tasks.filter(x=>x.id!==t.id);save();toast('Tugas dihapus')}}if(b.dataset.action==='next'){const states=['Belum dimulai','Sedang dikerjakan','Selesai'];t.status=states[(states.indexOf(t.status)+1)%states.length];save();toast('Status tugas diubah')}});
+['searchInput','statusFilter','sortFilter'].forEach(id=>$(id).addEventListener(id==='searchInput'?'input':'change',render));
+$('todayText').textContent=new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});$('welcomeDate').textContent='📅 '+new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});
+render();
+</script>
+</body>
+</html>
